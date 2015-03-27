@@ -1,64 +1,50 @@
 
 # Makefile B3230 - TP Multitâche Carrefour
 
-# Commandes
-CP = cp
-RM = rm
-ECHO = @echo
-EDL = g++
-COMP = g++
-EFF = clean
+# Exécutable
+EXE=Carrefour
 
-# Fichiers sources
-INT = Mere.h Interface.h Feux.h Voie.h
+# Commandes
+CPPFLAGS = -Wall -g -I $(INCLUDE_TP)	
+EDLFLAGS = -L $(LIBPATH_TP) $(LIB_SYS)
+
+COPY = cp
+REMOVE = rm
+ECHO = @echo
+GCC = g++
+
+# Sources
+INT = src/Appli.h src/GestClavier.h src/GestFeux.h src/GestVoie.h
 REAL = $(INT:.h=.cpp) 
 OBJ = $(INT:.h=.o)
 
-# Exécutable
-EXE = Carrefour
-
-# Options des commandes
-CPFLAGS = -p
-RMFLAGS = -f
-EDLFLAGS = -o
-COMPFLAGS = -c
-CPPFLAGS =
-
 # Chemins pour les options
 CPPATH = backup/
-LIBPATH = -L/public/tp/tp-multitache
-INCPATH = -I/public/tp/tp-multitache
+BACKUPPATH = ./Compte-Rendu/2015/2/B3230
+LIBPATH = -L ./
+INCPATH = -I ./
 
-# Librairies pour l'édition des liens
-LIBS = -ltp -lncurses -ltcl
-
-# Règles
-EFF = clean
-BACKUP = backup
-
-
-#---- PHONY
-.PHONY: $(EFF) $(BACKUP)
+# Librairies
+INCLUDE_TP = ./
+LIBPATH_TP = $(INCLUDE_TP)
+LIB_SYS = -lncurses -ltcl -ltp
 
 
-#---- Règles
-# Edition des liens
+# PHONY
+.PHONY: clean backup
+
+# EDL
 $(EXE): $(OBJ)
-	$(ECHO) "EDL de <makefile>"
-	$(EDL) $(LIBPATH) $(EDLFLAGS) $(EXE) $(OBJ) $(LIBS)
+	$(GCC) -o $(EXE) $^ $(EDLFLAGS)
 
-# Compilation des sources
-# --> Compile tout les *.o à l'aide du *.cpp correspondant et de l'ensemble des *.h
-%.o: %.cpp $(INT)
-	$(ECHO) "Compil de <"$<">"
-	$(COMP) $(INCPATH) $(CPPFLAGS) $(COMPFLAGS) $<
 
+# COMPILATION
+src/%.o: %.cpp $(INT)
+	$(GCC) -c $< $(CPPFLAGS)			
 # Clean
-# --> Efface les fichiers *.o, l'exécutable et le core
-$(EFF):
+clear:
 	$(RM) $(RMFLAGS) $(EXE) $(OBJ) core
 
 # Backup
-# --> Copie les fichiers *.o et *.h dans le dossier $(CPPath) (par défaut backup/)
-$(BACKUP):
+backup:
 	$(CP) $(CPFLAGS) $(INT) $(REAL) $(CPPATH)
