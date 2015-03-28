@@ -140,7 +140,7 @@ void GestFeux (int idSemEtat, int idMemEtat, int idSemDuree, int idMemDuree) {
 // Contrat :
 //
 // Algorithme :
-//	- Création de l'handler et armement du signal SIG_USR2
+//	- Création de l'handler et armement du signal SIGUSR2
 //	- Attachement à la mémoire partagée étatFeux
 //	- Sauvegarde de l'adresse du sémaphore chargé de étatFeux (semEtat)
 //	- Attachement à la mémoire partagée duréeFeux
@@ -225,10 +225,25 @@ void GestFeux (int idSemEtat, int idMemEtat, int idSemDuree, int idMemDuree) {
 
 		}
 
-		// Le feu sur l'axe N-S passe à rouge et celui sur l'axe E-O à vert :
+		// Le feu sur l'axe N-S passe à rouge :
 		//	- Affichage
 		Effacer(COULEUR_AXE_NS);
 		Afficher(COULEUR_AXE_NS, ROUGE, GRAS, INVERSE);
+
+		// Attente feu rouge sur les deux axes
+
+		for(int i = DUREE_ROUGE; i > 0; i--) {
+
+			Effacer(TEMPS_AXE_NS);
+			Afficher(TEMPS_AXE_NS, i, STANDARD, NORMALE);
+			Effacer(TEMPS_AXE_EO);
+			Afficher(TEMPS_AXE_EO, i, STANDARD, NORMALE);
+			sleep(1);
+
+		}
+
+		// Le feu sur l'axe E-O passe à vert :
+		//	- Affichage
 		Effacer(COULEUR_AXE_EO);
 		Afficher(COULEUR_AXE_EO, VERT, STANDARD, NORMALE);
 		//	- Mise à jour de la mémoire partagée
@@ -267,10 +282,25 @@ void GestFeux (int idSemEtat, int idMemEtat, int idSemDuree, int idMemDuree) {
 
 		}
 
-		// Le feu sur l'axe N-S passe à rouge et celui sur l'axe E-O à vert :
+		// Le feu sur l'axe E-O passe à rouge :
 		//	- Affichage
 		Effacer(COULEUR_AXE_EO);
 		Afficher(COULEUR_AXE_EO, ROUGE, GRAS, INVERSE);
+
+		// Attente feu rouge sur les deux axes
+
+		for(int i = DUREE_ROUGE; i > 0; i--) {
+
+			Effacer(TEMPS_AXE_EO);
+			Afficher(TEMPS_AXE_EO, i, STANDARD, NORMALE);
+			Effacer(TEMPS_AXE_NS);
+			Afficher(TEMPS_AXE_NS, i, STANDARD, NORMALE);
+			sleep(1);
+
+		}
+
+		// Le feu sur l'axe N-S passe à vert :
+		//	- Affichage
 		Effacer(COULEUR_AXE_NS);
 		Afficher(COULEUR_AXE_NS, VERT, STANDARD, NORMALE);
 		//	- Mise à jour de la mémoire partagée

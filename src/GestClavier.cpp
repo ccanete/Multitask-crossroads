@@ -78,7 +78,7 @@ void GestClavier (pid_t generateur, int idBAL, int idSem, int idMemDuree) {
 
 	vBAL = idBAL;
 	semDuree = idSem;
-	//dureeFeux = (Duree *) shmat(idMemDuree, NULL, 0);
+	//dureeFeux = (Duree *) shmat(idMemDuree, SHM_WRONLY, 0);
  	pidGen = generateur;
  	genActif = false;
  	numVoiture = ONE;
