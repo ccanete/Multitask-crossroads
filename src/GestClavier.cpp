@@ -37,24 +37,15 @@ static int semDuree;
 static bool genActif;
 static unsigned int numVoiture;
 
-//static Duree * dureeVert;
+//static Duree * dureeFeux;
 
-
-//------------------------------------------------------ Fonctions privées
-//static type nom ( liste de paramètres )
-// Mode d'emploi :
-//
-// Contrat :
-//
-// Algorithme :
-//
-//{
-//} //----- fin de nom
-
+// struct utilisée par le sémaphore
+static struct sembuf reserver = {0, -1, 0};
+static struct sembuf liberer = {0, 1, 0};
 
 //////////////////////////////////////////////////////////////////  PUBLIC
 //---------------------------------------------------- Fonctions publiques
-void GestClavier ( pid_t generateur, int idBAL, int idSem, int idMemDuree ) {
+void GestClavier (pid_t generateur, int idBAL, int idSem, int idMemDuree) {
 // Mode d'emploi :
 //  generateur	: le pid du générateur
 //  idBAL   	: L'ID de la boîte aux lettres contenant les 
@@ -75,33 +66,32 @@ void GestClavier ( pid_t generateur, int idBAL, int idSem, int idMemDuree ) {
 // 	- Initialisation numéro voiture
 //	- Exécution de la procedure Menu (BOUCLE INFINIE)
 
+	//						\\
+		//				\\
+			//		\\
 
-//						//
-	//				//
-		//		//
+		//INITIALISATION\\
 
-	//INITIALISATION//
-
-		//		//
-	//				//
-//						//
+			//		\\
+		//				\\
+	//						\\
 
 	vBAL = idBAL;
 	semDuree = idSem;
-	//dureeVert = (Duree *) shmat(idMemDuree, NULL, 0);
+	//dureeFeux = (Duree *) shmat(idMemDuree, NULL, 0);
  	pidGen = generateur;
  	genActif = false;
  	numVoiture = ONE;
 
-//						//
-	//				//
-		//		//
+	//						\\
+		//				\\
+			//		\\
 
-		//MOTEUR//
-	
-		//		//
-	//				//
-//						//
+			//MOTEUR\\
+		
+			//		\\
+		//				\\
+	//						\\
 
  	Menu();
 
@@ -121,15 +111,15 @@ void Commande (char code) {
 
 	if (code == 'Q') {
 
-		//						//
-			//				//
-				//		//
+		//						\\
+			//				\\
+				//		\\
 
-			  //DESTRUCTION//
-			
-				//		//
-			//				//
-		//						//
+			  //DESTRUCTION\\
+				
+				//		\\
+			//				\\
+		//						\\
 
 		//	Affichage message de sortie
 		
@@ -138,7 +128,7 @@ void Commande (char code) {
 
 		//	- Détachement de la mémoire partagée
 		
- 		//shmdt(dureeVert);
+ 		//shmdt(dureeFeux);
 
 		// Nettoyage du contexte d'exécution et déstruction de la tâche
 
@@ -150,7 +140,7 @@ void Commande (char code) {
 
 			case true:
 
-				// Envoye du signal de stop
+				// Envoi du signal de stop
 				
 				kill (pidGen, SIGSTOP);
 
@@ -169,7 +159,7 @@ void Commande (char code) {
 
 			case false:
 
-				// Envoye du signal de reprise
+				// Envoi du signal de reprise
 				
 				kill (pidGen, SIGCONT);
 
@@ -244,9 +234,6 @@ void Commande (TypeVoie voie, unsigned int duree) {
 //  duree  : Durée d'attente dans l'êtat vert des feux choisis 
 //  -  Modification du temps des feux dans l'état vert
 // Algorithme : 
-//	- Creation des structures (Proberen <--> Tester, 
-//	  Verhogen <--> Incrementer) contenant les indications
-//	  pour le sémaphore
 //	- Contrôle de l'axe à modifier
 //	- Modification de la mémoire partagée à travers l'utilisation du sémaphore
 //	- Affichage d'un message confirmant la correcte modification du sémaphore
@@ -254,40 +241,28 @@ void Commande (TypeVoie voie, unsigned int duree) {
 //				la mémoire partagée concernant la durée 
 //				d'attente dans l'état vert des feux
 //				de la voie choisie
-	
-	// Creation des SemBuf
-	//	- Incrementer :
-	struct sembuf duree_V;
-	duree_V.sem_num = semDuree;
-	duree_V.sem_op = 1;
-	duree_V.sem_flg = 0;
-	//	- Tester :
-	struct sembuf duree_P;
-	duree_P.sem_num = semDuree;
-	duree_P.sem_op = -1;
-	duree_P.sem_flg = 0;
-
 
 	if (voie == NORD || voie == SUD) {
 
-		semop(semDuree, &duree_P, 1);
-		//dureeVert->nS = duree;		// Mémoire partagée --> résource critique
-		semop(semDuree, &duree_V, 1);
+		semop(semDuree, &reserver, 1);
+		//dureeFeux->nS = duree;		// Mémoire partagée --> résource critique
+		semop(semDuree, &liberer, 1);
 
 		// Affichage
 
 		Effacer(MESSAGE);
-		Afficher(MESSAGE, "Duree du feux de l'axe N-S modifie correctement (attendre le prochain changement)");
+		Afficher(MESSAGE, "Duree du feux de l'axe N-S modifie (attendre le prochain changement)");
 
 	} else if (voie == OUEST || voie == EST) {
 
-		semop(semDuree, &duree_P, 1);
-		//dureeVert->eO = duree;		// Mémoire partagée --> résource critique
-		semop(semDuree, &duree_V, 1);
+		semop(semDuree, &reserver, 1);
+		//dureeFeux->eO = duree;		// Mémoire partagée --> résource critique
+		semop(semDuree, &liberer, 1);
 
 		// Affichage
+
 		Effacer(MESSAGE);
-		Afficher(MESSAGE, "Duree du feux de l'axe E-O modifie correctement (attendre le prochain changement)");
+		Afficher(MESSAGE, "Duree du feux de l'axe E-O modifie (attendre le prochain changement)");
 	
 	}
 

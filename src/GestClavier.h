@@ -5,7 +5,7 @@
     copyright            : (C) Andrea Accardo
 *************************************************************************/
 
-//---------- Interface de la tâche <GestClavier> (fichier GestClavier.h) -------
+//----- Interface de la tâche <GestClavier> (fichier GestClavier.h) ------
 #if ! defined ( GestClavier_H )
 #define GestClavier_H
 
