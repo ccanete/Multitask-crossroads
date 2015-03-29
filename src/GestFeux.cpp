@@ -81,7 +81,6 @@ static void updateMemDuree() {
 	semop(semDuree, &liberer, 1);
 
 	// Affichage durées des feux
-
   	Effacer(DUREE_AXE_NS);
 	Afficher(DUREE_AXE_NS, dureeNS);
   	Effacer(DUREE_AXE_EO);
