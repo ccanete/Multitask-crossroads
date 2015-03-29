@@ -23,6 +23,7 @@
 //------------------------------------------------------ Include personnel
 #include "GestVoie.h"
 #include "Appli.h"
+#include "GestClavier.h"
 
 #include "Voiture.h"
 #include "Outils.h"
@@ -124,38 +125,38 @@ void Voie( TypeVoie voie, int idEtatFeux, int idFileVoiture )
 
     for (;;)
     {
-      // Attente de la prochaine voiture à traiter par la voie en question
-      // if(msgrcv(myBAL, &msg, TAILLE_MSG_VOITURE, nVoie, 1)!=-1)
-      // {
-      //   // Display     
-      //   DessinerVoitureFeu(msg.uneVoiture.numero, msg.uneVoiture.entree, msg.uneVoiture.sortie);
-      //   OperationVoie (MOINS, nVoie);
+      //Attente de la prochaine voiture à traiter par la voie en question
+      if(msgrcv(fileVoiture, &msg, TAILLE_MSG_VOITURE, dirVoie, 1)!=-1)
+      {
+        // Display     
+        DessinerVoitureFeu(msg.uneVoiture.numero, msg.uneVoiture.entree, msg.uneVoiture.sortie);
+        OperationVoie (MOINS, dirVoie);
 
-      //   if (nVoie == NORD || nVoie == SUD)
-      //   {
-      //     // Attente du passage du feux au vert
-      //     while (!feux->nS)
-      //     {
-      //       sleep(1);
-      //     }
+        if (dirVoie == NORD || dirVoie == SUD)
+        {
+          // Attente du passage du feux au vert
+          while (!etatFeux->nS)
+          {
+            sleep(1);
+          }
           
-      //     // Création de la tache de déplacement de la voiture et ajout à la liste des tache en execution
-      //     pid_t voitureBouge =DeplacerVoiture(msg.uneVoiture.numero, msg.uneVoiture.entree, msg.uneVoiture.sortie);
-      //     vectDeplacement.push_back(voitureBouge);
-      //   }
-      //   else
-      //   {
-      //     // Attente du passage du feux au vert
-      //     while (!feux->eO)
-      //     {
-      //       sleep(1);
-      //     }
+          // Création de la tache de déplacement de la voiture et ajout à la liste des tache en execution
+          pid_t voitureBouge = DeplacerVoiture(msg.uneVoiture.numero, msg.uneVoiture.entree, msg.uneVoiture.sortie);
+          voituresDeplacement.push_back(voitureBouge);
+        }
+        else
+        {
+          // Attente du passage du feux au vert
+          while (!etatFeux->eO)
+          {
+            sleep(1);
+          }
 
-      //     // Création de la tache de déplacement de la voiture et ajout à la liste des tache en execution
-      //     pid_t voitureBouge =DeplacerVoiture(msg.uneVoiture.numero, msg.uneVoiture.entree, msg.uneVoiture.sortie);
-      //     vectDeplacement.push_back(voitureBouge);
-      //   }
-      // }
+          // Création de la tache de déplacement de la voiture et ajout à la liste des tache en execution
+          pid_t voitureBouge =DeplacerVoiture(msg.uneVoiture.numero, msg.uneVoiture.entree, msg.uneVoiture.sortie);
+          voituresDeplacement.push_back(voitureBouge);
+        }
+      }
 
     }
   } //----- fin de Voie
