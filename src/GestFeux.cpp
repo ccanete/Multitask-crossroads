@@ -169,9 +169,9 @@ void GestFeux (int idSemEtat, int idMemEtat, int idSemDuree, int idMemDuree) {
 	// Attachement aux mémoires partagée et sauvegarde
 	// des ID des respectifs sémaphores
 	
-	//etatFeux = (Etat *) shmat(idMemEtat, SHM_RDONLY, 0);
+	//etatFeux = (Etat *) shmat(idMemEtat, NULL, SHM_RDONLY);
 	semEtat = idSemEtat;
-	//dureeFeux = (Duree *) shmat(idMemDuree, SHM_WRONLY, 0);
+	//dureeFeux = (Duree *) shmat(idMemDuree, NULL, SHM_WRONLY);
 	semDuree = idSemDuree;
 	
 	// Initialisation de l'interface graphique
