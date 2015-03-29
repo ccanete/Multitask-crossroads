@@ -44,8 +44,8 @@ int fileVoiture;
 //------------------------------------------------------ Fonctions privées
 
 static void handlerFinDeplacement (int typeSignal)
-// Recherche du pid de la tache ayant envoyé le signal, et suppression
-// du pid de la structure de donnée existante
+// Mode d'emploi :
+// Supprime la voiture (son pid) du vecteur voituresDeplacement quand la voiture est sortie du Carrefour
 {
   if (typeSignal == SIGCHLD)
   {
@@ -64,9 +64,8 @@ static void handlerFinDeplacement (int typeSignal)
 }
 
 static void  handlerFinTache (int typeSignal)
-// Algorithme :
-// Parcourt de la structure de donnée, et on tue toutes les taches de 
-// déplacement en cours, avant de quitter la tache
+// Mode d'emploi :
+// Parcours la liste des voiture en déplacement et tue chaque tache voiture avant de tuer la tache gestVoie.
 {
   if (typeSignal == SIGUSR2)
   {
@@ -90,12 +89,17 @@ static void  handlerFinTache (int typeSignal)
 
 //////////////////////////////////////////////////////////////////  PUBLIC
 //---------------------------------------------------- Fonctions publiques
-void Voie( TypeVoie voie, int idEtatFeux, int idFileVoiture )
-// Algorithme :
-// Phase d'initilisation triviale
-// Phase moteur : attente d'une voiture dans la BAL pui affichage de celle - ci
-// Une fois affichée, on attend que le feux passe au vert et on déplace la voiture
-// après l'avoir ajoutée à la structure de donnée stoquant les voitures en déplacement
+void GestVoie( TypeVoie voie, int idEtatFeux, int idFileVoiture )
+// Mode d'emploi :
+//	fonction GestVoie, gere le passage des voitures aux feux
+//	
+// Contrat :
+//	x32 OS
+// 
+//	Algorithme :
+//	- Mise en place des HANDLER finTache et finDeplacement
+//	- Attachement memoire partagee
+//	- Gestion des voitures au feu 
 {
 
 	//  =====  Initialisation  ===== //
@@ -109,9 +113,9 @@ void Voie( TypeVoie voie, int idEtatFeux, int idFileVoiture )
     struct sigaction actionFinDeplacement;
     struct sigaction actionFinTache;
 
-    actionFinTache.sa_handler = handlerFinDeplacement;
-    actionFinTache.sa_flags = 0;
-    sigaction (SIGCHLD, &actionFinTache, NULL);
+    actionFinDeplacement.sa_handler = handlerFinDeplacement;
+    actionFinDeplacement.sa_flags = 0;
+    sigaction (SIGCHLD, &actionFinDeplacement, NULL);
 
     actionFinTache.sa_handler = handlerFinTache;
     actionFinTache.sa_flags = 0;
@@ -125,36 +129,36 @@ void Voie( TypeVoie voie, int idEtatFeux, int idFileVoiture )
 
     for (;;)
     {
-      //Attente de la prochaine voiture à traiter par la voie en question
+      //	attend qu'une nouvelle voiture soit prete a etre traitee
       if(msgrcv(fileVoiture, &msg, TAILLE_MSG_VOITURE, dirVoie, 1)!=-1)
       {
-        // Display     
+        //	affiche la voiture au feu 
         DessinerVoitureFeu(msg.uneVoiture.numero, msg.uneVoiture.entree, msg.uneVoiture.sortie);
         OperationVoie (MOINS, dirVoie);
 
         if (dirVoie == NORD || dirVoie == SUD)
         {
-          // Attente du passage du feux au vert
-          while (!etatFeux->nS)
+          //	On est civilise, on attend que le feu passe au vert
+          while (!etatFeux->feuxNS)
           {
             sleep(1);
           }
           
-          // Création de la tache de déplacement de la voiture et ajout à la liste des tache en execution
-          pid_t voitureBouge = DeplacerVoiture(msg.uneVoiture.numero, msg.uneVoiture.entree, msg.uneVoiture.sortie);
-          voituresDeplacement.push_back(voitureBouge);
+          //	le feu est vert, on y va : on cree la tache voiture et on fait deplacer la voiture sur l'interface
+          pid_t nouvelleVoiture = DeplacerVoiture(msg.uneVoiture.numero, msg.uneVoiture.entree, msg.uneVoiture.sortie);
+          voituresDeplacement.push_back(nouvelleVoiture);
         }
         else
         {
-          // Attente du passage du feux au vert
-          while (!etatFeux->eO)
+          //	On est civilise, on attend que le feu passe au vert
+          while (!etatFeux->feuxEO)
           {
             sleep(1);
           }
 
-          // Création de la tache de déplacement de la voiture et ajout à la liste des tache en execution
-          pid_t voitureBouge =DeplacerVoiture(msg.uneVoiture.numero, msg.uneVoiture.entree, msg.uneVoiture.sortie);
-          voituresDeplacement.push_back(voitureBouge);
+          //	le feu est vert, on y va : on cree la tache voiture et on fait deplacer la voiture sur l'interface
+          pid_t nouvelleVoiture =DeplacerVoiture(msg.uneVoiture.numero, msg.uneVoiture.entree, msg.uneVoiture.sortie);
+          voituresDeplacement.push_back(nouvelleVoiture);
         }
       }
 

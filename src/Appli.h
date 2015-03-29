@@ -10,51 +10,43 @@
 #if ! defined ( Appli_H )
 #define Appli_H
 
+#define DROITS	0666
 //------------------------------------------------------------------------
 // Rôle de la tâche <Appli>
 //
-//
+//	Tache mere du Carrefour, initialise l'application, attends la fin de l'application et ferme les taches en cours.
 //------------------------------------------------------------------------
 
 /////////////////////////////////////////////////////////////////  INCLUDE
-//--------------------------------------------------- Interfaces utilisées
-
-//------------------------------------------------------------- Constantes
 
 //------------------------------------------------------------------ Types
 
-// Etats des Feux
-// état :
-//	- faux : feu rouge/orange
-//	- vrai : feu vert
-//
-// eO : axe Est-Ouest
-// nS : axe Nord-Sud
-struct EtatFeux
-{
-    bool eO;
-    bool nS;
-};
-
-
-// Durée des Feux
-// eO : axe Est-Ouest
-// nS : axe Nord-Sud
+//	Durée des Feux
+//	dureeNS : axe Nord/Sud
+//	dureeEO : axe Est/Ouest
 struct Duree
 {
-    int eO;
-    int nS;
+    int dureeNS;
+    int dureeEO;
 };
 
-int main();
+//	Etats des feux NS et EO
+//	vrai : vert, faux : orange ou rouge
+//	feuxNS : axe Nord/Sud
+//	feuxEO : axe Est/Ouest
+
+struct EtatFeux
+{
+    bool feuxNS;	
+    bool feuxEO;
+};
+
 
 //////////////////////////////////////////////////////////////////  PUBLIC
 //---------------------------------------------------- Fonctions publiques
-// type Nom ( liste de paramètres );
-// Mode d'emploi :
-//
-// Contrat :
-//
+
+int main();
+
 
 #endif // Appli_H
 

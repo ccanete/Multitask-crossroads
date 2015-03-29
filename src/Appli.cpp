@@ -23,92 +23,95 @@
 //------------------------------------------------------ Include personnel
 #include "Appli.h"
 #include "GestClavier.h"
+#include "GestVoie.h"
+#include "GestFeux.h"
+
 
 #include "Outils.h"
 #include "Heure.h"
 #include "Generateur.h"
 
 ///////////////////////////////////////////////////////////////////  PRIVE
-//------------------------------------------------------------- Constantes
-
-//------------------------------------------------------------------ Types
-
-//---------------------------------------------------- Variables statiques
-
 //------------------------------------------------------ Fonctions privées
 
-int ouvrirBAT( key_t keyval )
-{
-        int     qid;
-        
-        if((qid = msgget( keyval, IPC_CREAT | 0660 )) == -1)
-        {
-                return(-1);
-        }
-        
-        return(qid);
-}
-
-static void detruireBAL(int idBAT)
+int creerBAL (int droits)
 // Mode d'emploi :
-// Détruit les boites aux lettres
-// <fileVoitures> : id de la BAL contenant les voitures
-//
-// Algorithme :
-// Trivial
+// Cree une boite aux lettres
+// <droits> : droits de la tache sur la BAT
+// renvoie l'id de la BAT
+{
+	return = msgget(IPC_PRIVATE, droits | IPC_CREAT);
+} //----- fin de creerBAL
+
+void detruireBAL(int idBAT)
+// Mode d'emploi :
+// Detruit une boite aux lettres
+// <idBAT> : id de la BAT à détruire
 {
     msgctl(idBAT, IPC_RMID, 0);
 } //----- fin de detruireBAL
 
 int creerMemoire(size_t taille, int droits)
 // Mode d'emploi :
-// Créé une zone de memoire partagee de taille definie
-// <idMemoire> : id de la zone mémoire partagée
-//
+// Cree une zone memoire partagee
+// <taille> : taille de la memoire a allouer
+// <droits> : droits de la tache sur la BAT
+// renvoie l'id de la memoire creee
 {
-    // creer zone memoire
 	int idMemoire = shmget(IPC_PRIVATE, taille, droits | IPC_CREAT);
-
 	return idMemoire;
 } //----- fin de creerMemoire
 
 void * attacherMemoire (int idMemoire)
+// Mode d'emploi :
+// Permet a la tache d'acceder a la memoire
+// <idMemoire> : id de la memoire a laquelle acceder
+// renvoie la zone memoire
 {
 	return shmat (idMemoire, NULL, 0);
-}
+} //----- fin de attacherMemoire
 
 void detacherMemoire (const void * zone)
+// Mode d'emploi :
+// Permet a la rendre l'acces a une zone memoire
+// <zone> : zone memoire a rendre
 {
 	shmdt(zone);
-}
+} //----- fin de detacherMemoire
 
 void detruireMemoire (int idMemoire)
+// Mode d'emploi :
+// Detruit une zone memoire
+// <idMemoire> : id de la zone memoire a detruire
 {
 	shmctl (idMemoire, IPC_RMID, 0);
-}
+} //----- fin de detruireMemoire
 
 
-int CreerSemaphore ( int valInit, int valMax, int droits)
+int creerSemaphore ( int valInit, int valMax, int droits)
 // Mode d'emploi :
-//  - Cree un semaphore au nom défini et renvoie un id de semaphore
-//  - On devra préciser sa valeur initiale et sa valeur maximale
-//  - On précisera également les options de lecture/écriture
+// Cree un Semaphore
+// <valInit> : valeur initiale du nombre de jeton
+// <valMax> : valeur max de jetons
+// <droits> : droits de la tache sur le semaphore
+// renvoie l'id du semaphore cree
 {
   int idSem = semget ( IPC_PRIVATE, valMax, IPC_CREAT | droits);
   semctl ( idSem, 0, SETVAL, valInit );
   return idSem;
-} // Fin de CreerSemaphore
+} //----- fin de creerSemaphore
 
-void DetruireSemaphore ( int idSem )
+void detruireSemaphore ( int idSem )
 // Mode d'emploi :
-// Détruis un semaphore avec son id
+// Detruit un Semaphore
+// <idMemoire> : id du Semaphore a detruire
 {
   semctl ( idSem, 0, IPC_RMID, 0 );
-} // Fin de DetruireSemaphore
+} //----- fin de detruireSemaphore
 
 int main() {
 // Mode d'emploi :
-//	main function
+//	fonction mere, gere l'application
 //	
 // Contrat :
 //	x32 OS
@@ -140,8 +143,8 @@ int main() {
 
 	pid_t pidHeure;
 	pid_t pidGenerateur;
-	// pid_t pidVoie[4];
-	// pid_t pidFeux;
+	pid_t pidVoie[4];
+	pid_t pidFeux;
 	pid_t pidClavier;
 
 
@@ -161,50 +164,89 @@ int main() {
 	//	fin masquage
 
 	//	-- mise en place boite aux lettres
-	boiteLettresVoitures = msgget(IPC_PRIVATE, 0666 | IPC_CREAT);
+	boiteLettresVoitures = creerBAL(DROITS);
 
 	//	-- mise en place memoire partagee
-	idMemEtatFeux = creerMemoire ( sizeof(EtatFeux), 0666);
-	idMemDureeFeux = creerMemoire ( sizeof(Duree), 0666);
+	idMemEtatFeux = creerMemoire ( sizeof(EtatFeux), DROITS);
+	idMemDureeFeux = creerMemoire ( sizeof(Duree), DROITS);
 
 	//	initialiser memoires
 	duree_feux = (struct Duree *) attacherMemoire ( idMemDureeFeux );
 	etat_feux = (struct EtatFeux *) attacherMemoire ( idMemEtatFeux );
 
-	duree_feux->eO = 12;
-	duree_feux->nS = 18;
+	duree_feux->dureeEO = 10;
+	duree_feux->dureeNS = 20;
 
-	etat_feux->eO = false;
-	etat_feux->nS = false;
+	etat_feux->feuxEO = false;
+	etat_feux->feuxNS = false;
 
 	detacherMemoire (duree_feux);
 	detacherMemoire (etat_feux);
 	//	fin initialisation memoires
 
 	// -- mise en place des semaphores
-	idSemDureeFeux = CreerSemaphore (1, 1, 0666);	
-	idSemEtatFeux = CreerSemaphore (1, 1, 0666);
+	idSemDureeFeux = creerSemaphore (1, 1, DROITS);	
+	idSemEtatFeux = creerSemaphore (1, 1, DROITS);
 
 
 	//  -- initialiser application
 	InitialiserApplication ( XTERM );
   	
+	//	== Creation des taches ==
+
 	//  -- creer tache Heure
   	pidHeure = CreerEtActiverHeure ();
 
   	//	-- creer tache generateur
   	pidGenerateur = CreerEtActiverGenerateur(0, boiteLettresVoitures);
 
-  	//	-- crer GestClavier
+  	//	-- creer tache gestion de Feux
+  	if( ( pidFeux = fork ( ) ) == 0 )
+    {
+      GestFeux (idSemEtatFeux, idMemEtatFeux, idSemDureeFeux, idMemDureeFeux);
+    }
+
+  	//	-- creer taches gestion de voies
+    if( ( pidVoie[0] = fork ( ) ) == 0 )
+    {
+      GestVoie (SUD, idMemDureeFeux, boiteLettresVoitures);
+    }
+    if( ( pidVoie[1] = fork ( ) ) == 0 )
+    {
+      GestVoie (OUEST, idMemDureeFeux, boiteLettresVoitures);
+    }
+    if( ( pidVoie[2] = fork ( ) ) == 0 )
+    {
+      GestVoie (NORD, idMemDureeFeux, boiteLettresVoitures);
+    }
+    if( ( pidVoie[3] = fork ( ) ) == 0 )
+    {
+      GestVoie (EST, idMemDureeFeux, boiteLettresVoitures);
+    }
+
+  	//	-- creer GestClavier
   	if( ( pidClavier = fork ( ) ) == 0 )
     {
       GestClavier (pidGenerateur, boiteLettresVoitures, idSemDureeFeux, idMemDureeFeux);
     }
 
 
+
   	//  =====  Destruction  =====  //
     waitpid(pidClavier, NULL, 0);
 
+  	//	-- detruire taches Voies
+	int i;
+	for(i = 0; i < 4; i++)
+	{
+		kill(pidVoie[i], SIGUSR2);
+		waitpid(pidVoie[i], NULL, 0);
+	}
+
+  	//	-- detruire tache Feux
+	kill(pidFeux, SIGUSR2);
+	waitpid(pidFeux, NULL, 0);
+	
   	//	-- detruire tache Generateur
 	kill(pidGenerateur, SIGCONT);
   	kill(pidGenerateur, SIGUSR2);
@@ -226,5 +268,8 @@ int main() {
 	detruireBAL(boiteLettresVoitures);
 
 	//  detruire application
-	TerminerApplication();	
-}
+	TerminerApplication();
+
+	return 0;
+
+} //----- fin de main

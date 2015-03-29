@@ -29,8 +29,8 @@
 static int semEtat;
 static int semDuree;
 
-//static Etat * etatFeux;
-//static Duree * dureeFeux;
+static EtatFeux * etatFeux;
+static Duree * dureeFeux;
 
 static unsigned int dureeNS;
 static unsigned int dureeEO;
@@ -57,8 +57,8 @@ static void destruction(int noSignal) {
 
 	// Détachement de etatFeux et semDuree
 
-	//shmdt(etatFeux);
-	//shmdt(semDuree);
+	shmdt(etatFeux);
+	shmdt(dureeFeux);
 
 	// Sortie
 
@@ -76,8 +76,8 @@ static void updateMemDuree() {
 // 	- Mise à jour de l'affichage de l'interface
 
 	semop(semDuree, &reserver, 1);
-	//dureeNS = dureeFeux->nS;		// Mémoire partagée --> résource critique
-	//dureeEO = dureeFeux->eO;		// Mémoire partagée --> résource critique
+	dureeNS = dureeFeux->dureeNS;		// Mémoire partagée --> résource critique
+	dureeEO = dureeFeux->dureeEO;		// Mémoire partagée --> résource critique
 	semop(semDuree, &liberer, 1);
 
 	// Affichage durées des feux
@@ -96,8 +96,8 @@ static void updateMemEtat(bool etatNS, bool etatEO) {
 //	  l'utilisation du sémaphore
 
 	semop(semEtat, &reserver, 1);
-	//etatFeux->nS = etatNS;		// Mémoire partagée --> résource critique
-	//etatFeux->eO = etatEO;		// Mémoire partagée --> résource critique
+	etatFeux->feuxNS = etatNS;		// Mémoire partagée --> résource critique
+	etatFeux->feuxEO = etatEO;		// Mémoire partagée --> résource critique
 	semop(semEtat, &liberer, 1);
 
 }
@@ -168,9 +168,9 @@ void GestFeux (int idSemEtat, int idMemEtat, int idSemDuree, int idMemDuree) {
 	// Attachement aux mémoires partagée et sauvegarde
 	// des ID des respectifs sémaphores
 	
-	//etatFeux = (Etat *) shmat(idMemEtat, NULL, SHM_RDONLY);
+	etatFeux = (EtatFeux *) shmat(idMemEtat, NULL, 0);
 	semEtat = idSemEtat;
-	//dureeFeux = (Duree *) shmat(idMemDuree, NULL, SHM_WRONLY);
+	dureeFeux = (Duree *) shmat(idMemDuree, NULL, 0);
 	semDuree = idSemDuree;
 	
 	// Initialisation de l'interface graphique

@@ -17,6 +17,7 @@
 #include <sys/msg.h>
 //------------------------------------------------------ Include personnel
 #include "GestClavier.h"
+#include "Appli.h"
 
 #include "Generateur.h"
 #include "Voiture.h"
@@ -35,9 +36,9 @@ static int semDuree;
 static bool genActif;
 static unsigned int numVoiture;
 
-//static Duree * dureeFeux;
+static Duree * dureeFeux;
 
-// struct utilisée par le sémaphore
+//struct utilisée par le sémaphore
 static struct sembuf reserver = {0, -1, 0};
 static struct sembuf liberer = {0, 1, 0};
 
@@ -76,7 +77,7 @@ void GestClavier (pid_t generateur, int idBAL, int idSem, int idMemDuree) {
 
 	vBAL = idBAL;
 	semDuree = idSem;
-	//dureeFeux = (Duree *) shmat(idMemDuree, NULL, SHM_WRONLY);
+	dureeFeux = (Duree *) shmat(idMemDuree, NULL, 0);
  	pidGen = generateur;
  	genActif = false;
  	numVoiture = ONE;
@@ -126,7 +127,7 @@ void Commande (char code) {
 
 		//	- Détachement de la mémoire partagée
 		
- 		//shmdt(dureeFeux);
+ 		shmdt(dureeFeux);
 
 		// Nettoyage du contexte d'exécution et déstruction de la tâche
 
@@ -243,7 +244,7 @@ void Commande (TypeVoie voie, unsigned int duree) {
 	if (voie == NORD || voie == SUD) {
 
 		semop(semDuree, &reserver, 1);
-		//dureeFeux->nS = duree;		// Mémoire partagée --> résource critique
+		dureeFeux->dureeNS = duree;		// Mémoire partagée --> résource critique
 		semop(semDuree, &liberer, 1);
 
 		// Affichage
@@ -254,7 +255,7 @@ void Commande (TypeVoie voie, unsigned int duree) {
 	} else if (voie == OUEST || voie == EST) {
 
 		semop(semDuree, &reserver, 1);
-		//dureeFeux->eO = duree;		// Mémoire partagée --> résource critique
+		dureeFeux->dureeEO = duree;		// Mémoire partagée --> résource critique
 		semop(semDuree, &liberer, 1);
 
 		// Affichage
