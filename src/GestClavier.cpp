@@ -151,7 +151,7 @@ void Commande (char code) {
 				
 				// Changement du valeur de la variable genActif
 				
-				genActif = false ;
+				genActif = false;
 				
 				break;
 
@@ -170,7 +170,7 @@ void Commande (char code) {
 				
 				// Changement du valeur de la variable genActif
 				
-				genActif = false ;
+				genActif = true;
 				
 				break;
 		}
