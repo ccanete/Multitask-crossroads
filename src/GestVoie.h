@@ -1,22 +1,22 @@
 /*************************************************************************
-                           XXX  -  description
+                           GestVoie  -  description
                              -------------------
-    début                : XXX
-    copyright            : (C) XXX par XXX
-    e-mail               : XXX
+    copyright            : (C) GestVoie par Cyril Canete
+    e-mail               : cyril.canete@insa-lyon.fr
 *************************************************************************/
 
-//---------- Interface de la tâche <XXX> (fichier XXX.h) -------
-#if ! defined ( XXX_H )
-#define XXX_H
+//---------- Interface de la tâche <GestVoie> (fichier GestVoie.h) -------
+#if ! defined ( GestVoie_H )
+#define GestVoie_H
 
 //------------------------------------------------------------------------
-// Rôle de la tâche <XXX>
+// Rôle de la tâche <GestVoie>
 //
-//
+// Gère l'affichage et le déplacement des voitures sur les voies
 //------------------------------------------------------------------------
 
 /////////////////////////////////////////////////////////////////  INCLUDE
+#include "Outils.h"
 //--------------------------------------------------- Interfaces utilisées
 
 //------------------------------------------------------------- Constantes
@@ -25,11 +25,14 @@
 
 //////////////////////////////////////////////////////////////////  PUBLIC
 //---------------------------------------------------- Fonctions publiques
-// type Nom ( liste de paramètres );
+void Voie( TypeVoie voie, int idEtatFeux, int idFileVoiture );
 // Mode d'emploi :
-//
+//	<numVoie>	: Choix de la voie creee
+//	<etatFeux>		: id zone mémoire etatFeux
+//	<fileVoiture>	: id boite au lettre fileVoiture
+// - Réception des messages et traitement des voitures
 // Contrat :
-//
+// Aucun
 
-#endif // XXX_H
+#endif // GestVoie_H
 

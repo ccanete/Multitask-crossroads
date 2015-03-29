@@ -23,6 +23,29 @@
 
 //------------------------------------------------------------------ Types
 
+// Etats des Feux
+// état :
+//	- faux : feu rouge/orange
+//	- vrai : feu vert
+//
+// eO : axe Est-Ouest
+// nS : axe Nord-Sud
+struct EtatFeux
+{
+    bool eO;
+    bool nS;
+};
+
+
+// Durée des Feux
+// eO : axe Est-Ouest
+// nS : axe Nord-Sud
+struct Duree
+{
+    int eO;
+    int nS;
+};
+
 int main();
 
 //////////////////////////////////////////////////////////////////  PUBLIC

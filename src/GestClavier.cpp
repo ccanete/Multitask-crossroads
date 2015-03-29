@@ -9,11 +9,6 @@
 
 /////////////////////////////////////////////////////////////////  INCLUDE
 //-------------------------------------------------------- Include système
-#include <Generateur.h>
-#include <Voiture.h>
-#include <Menu.h>
-#include <Outils.h>
-
 #include <stdlib.h>
 #include <signal.h>
 #include <sys/types.h>
@@ -22,8 +17,11 @@
 #include <sys/msg.h>
 //------------------------------------------------------ Include personnel
 #include "GestClavier.h"
-#include "Appli.h"
 
+#include "Generateur.h"
+#include "Voiture.h"
+#include "Menu.h"
+#include "Outils.h"
 ///////////////////////////////////////////////////////////////////  PRIVE
 //------------------------------------------------------------- Constantes
 
