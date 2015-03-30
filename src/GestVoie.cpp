@@ -18,6 +18,8 @@
 #include <sys/shm.h>
 #include <sys/msg.h>
 #include <sys/wait.h>
+#include <sys/sem.h>
+
 
 
 //------------------------------------------------------ Include personnel
@@ -89,7 +91,7 @@ static void  handlerFinTache (int typeSignal)
 
 //////////////////////////////////////////////////////////////////  PUBLIC
 //---------------------------------------------------- Fonctions publiques
-void GestVoie( TypeVoie voie, int idEtatFeux, int idFileVoiture )
+void GestVoie( TypeVoie voie, int idEtatFeux, int idSemEtat, int idFileVoiture )
 // Mode d'emploi :
 //	fonction GestVoie, gere le passage des voitures aux feux
 //	
@@ -124,6 +126,15 @@ void GestVoie( TypeVoie voie, int idEtatFeux, int idFileVoiture )
     //	-- Attachement memoire partagee
     etatFeux = (EtatFeux *) shmat(idEtatFeux, NULL, 0);
   	
+    //  -- Sauvegarde adresse du sémaphore
+    int semEtat = idSemEtat;
+
+    //  -- Initialisation variable état des feux
+    bool etatNS;
+    bool etatEO;
+
+    static struct sembuf reserver = {0, -1, 0};
+    static struct sembuf liberer = {0, 1, 0};
 
   	//  =====  Moteur ===== //
 
@@ -139,25 +150,42 @@ void GestVoie( TypeVoie voie, int idEtatFeux, int idFileVoiture )
         if (dirVoie == NORD || dirVoie == SUD)
         {
           //	On est civilise, on attend que le feu passe au vert
-          while (!etatFeux->feuxNS)
+            
+            semop(semEtat, &reserver, 1);
+            etatNS = etatFeux->feuxNS;    // Mémoire partagée --> résource critique
+            semop(semEtat, &liberer, 1);
+
+          while (!etatNS)
           {
             sleep(1);
+            semop(semEtat, &reserver, 1);
+            etatNS = etatFeux->feuxNS;    // Mémoire partagée --> résource critique
+            semop(semEtat, &liberer, 1); 
           }
-          
+            
           //	le feu est vert, on y va : on cree la tache voiture et on fait deplacer la voiture sur l'interface
           pid_t nouvelleVoiture = DeplacerVoiture(msg.uneVoiture.numero, msg.uneVoiture.entree, msg.uneVoiture.sortie);
           voituresDeplacement.push_back(nouvelleVoiture);
         }
         else
         {
-          //	On est civilise, on attend que le feu passe au vert
-          while (!etatFeux->feuxEO)
-          {
-            sleep(1);
-          }
 
+          semop(semEtat, &reserver, 1);
+          etatEO = etatFeux->feuxEO;    // Mémoire partagée --> résource critique
+          semop(semEtat, &liberer, 1);
+
+          //	On est civilise, on attend que le feu passe au vert
+          while (!etatEO)
+          {
+
+            sleep(1);
+            semop(semEtat, &reserver, 1);
+            etatEO = etatFeux->feuxEO;    // Mémoire partagée --> résource critique
+            semop(semEtat, &liberer, 1);
+          }
+            
           //	le feu est vert, on y va : on cree la tache voiture et on fait deplacer la voiture sur l'interface
-          pid_t nouvelleVoiture =DeplacerVoiture(msg.uneVoiture.numero, msg.uneVoiture.entree, msg.uneVoiture.sortie);
+          pid_t nouvelleVoiture = DeplacerVoiture(msg.uneVoiture.numero, msg.uneVoiture.entree, msg.uneVoiture.sortie);
           voituresDeplacement.push_back(nouvelleVoiture);
         }
       }

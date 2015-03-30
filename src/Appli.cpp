@@ -40,7 +40,7 @@ int creerBAL (int droits)
 // <droits> : droits de la tache sur la BAT
 // renvoie l'id de la BAT
 {
-	return = msgget(IPC_PRIVATE, droits | IPC_CREAT);
+	return msgget(IPC_PRIVATE, droits | IPC_CREAT);
 } //----- fin de creerBAL
 
 void detruireBAL(int idBAT)
@@ -209,19 +209,19 @@ int main() {
   	//	-- creer taches gestion de voies
     if( ( pidVoie[0] = fork ( ) ) == 0 )
     {
-      GestVoie (SUD, idMemDureeFeux, boiteLettresVoitures);
+      GestVoie (SUD, idMemEtatFeux, idSemEtatFeux, boiteLettresVoitures);
     }
     if( ( pidVoie[1] = fork ( ) ) == 0 )
     {
-      GestVoie (OUEST, idMemDureeFeux, boiteLettresVoitures);
+      GestVoie (OUEST, idMemEtatFeux, idSemEtatFeux, boiteLettresVoitures);
     }
     if( ( pidVoie[2] = fork ( ) ) == 0 )
     {
-      GestVoie (NORD, idMemDureeFeux, boiteLettresVoitures);
+      GestVoie (NORD, idMemEtatFeux, idSemEtatFeux, boiteLettresVoitures);
     }
     if( ( pidVoie[3] = fork ( ) ) == 0 )
     {
-      GestVoie (EST, idMemDureeFeux, boiteLettresVoitures);
+      GestVoie (EST, idMemEtatFeux, idSemEtatFeux, boiteLettresVoitures);
     }
 
   	//	-- creer GestClavier
@@ -257,8 +257,8 @@ int main() {
 	waitpid(pidHeure, NULL, 0);
 
 	//	-- detruire semaphores
-	DetruireSemaphore(idSemDureeFeux);
-	DetruireSemaphore(idSemEtatFeux);
+	detruireSemaphore(idSemDureeFeux);
+	detruireSemaphore(idSemEtatFeux);
 
 	//	-- detruire memoires partagees
 	detruireMemoire (idMemDureeFeux);

@@ -25,7 +25,7 @@
 
 //////////////////////////////////////////////////////////////////  PUBLIC
 //---------------------------------------------------- Fonctions publiques
-void GestVoie( TypeVoie voie, int idEtatFeux, int idFileVoiture );
+void GestVoie( TypeVoie voie, int idEtatFeux, int idSemEtat, int idFileVoiture );
 // Mode d'emploi :
 //	<numVoie>	: Choix de la voie creee
 //	<etatFeux>		: id zone mémoire etatFeux
