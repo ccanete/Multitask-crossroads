@@ -219,6 +219,13 @@ void Commande (TypeVoie entree, TypeVoie sortie) {
 
 	Effacer(MESSAGE);
 	Afficher(MESSAGE, "Voiture ajoute correctement a la liste");
+	Effacer(NUMERO);
+	Afficher(NUMERO, numVoiture, GRAS, NORMALE);
+	Effacer(ENTREE);
+	Afficher(ENTREE, entree, GRAS, NORMALE);
+	Effacer(SORTIE);
+	Afficher(SORTIE, sortie, GRAS, NORMALE);
+
 
 	// Ajout de la voiture dans l'interface grâce à la 
 	// méthode fournie dans Outils.h
