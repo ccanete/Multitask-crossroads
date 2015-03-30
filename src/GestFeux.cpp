@@ -83,9 +83,9 @@ static void updateMemDuree() {
 
 	// Affichage durées des feux
   	Effacer(DUREE_AXE_NS);
-	Afficher(DUREE_AXE_NS, dureeNS);
+	Afficher(DUREE_AXE_NS, dureeNS, GRAS, NORMALE);
   	Effacer(DUREE_AXE_EO);
-  	Afficher(DUREE_AXE_EO, dureeEO);
+  	Afficher(DUREE_AXE_EO, dureeEO, GRAS, NORMALE);
 
 }
 
@@ -121,14 +121,14 @@ static void init() {
   	// Affichage couleurs des feux
 
   	Effacer(COULEUR_AXE_NS);
-  	Afficher(COULEUR_AXE_NS, VERT, STANDARD, NORMALE);
+  	Afficher(COULEUR_AXE_NS, VERT, GRAS, NORMALE);
   	Effacer(COULEUR_AXE_EO);
   	Afficher(COULEUR_AXE_EO, ROUGE, GRAS, INVERSE);
 
   	// Affichage des temps initiaux des feux
 
-	Afficher(TEMPS_AXE_NS, dureeNS, STANDARD, NORMALE);
-	Afficher(TEMPS_AXE_EO, dureeNS + DUREE_ARRET, STANDARD, NORMALE);
+	Afficher(TEMPS_AXE_NS, dureeNS, GRAS, NORMALE);
+	Afficher(TEMPS_AXE_EO, dureeNS + DUREE_ARRET, GRAS, NORMALE);
 
 }
 
@@ -199,9 +199,9 @@ void GestFeux (int idSemEtat, int idMemEtat, int idSemDuree, int idMemDuree) {
 		for(int i = dureeNS; i > 0; i--) {
 
 			Effacer(TEMPS_AXE_NS);
-			Afficher(TEMPS_AXE_NS, i, STANDARD, NORMALE);
+			Afficher(TEMPS_AXE_NS, i, GRAS, NORMALE);
 			Effacer(TEMPS_AXE_EO);
-			Afficher(TEMPS_AXE_EO, i + DUREE_ARRET, STANDARD, NORMALE);
+			Afficher(TEMPS_AXE_EO, i + DUREE_ARRET, GRAS, NORMALE);
 			sleep(1);
 
 		}
@@ -218,9 +218,9 @@ void GestFeux (int idSemEtat, int idMemEtat, int idSemDuree, int idMemDuree) {
 		for(int i = DUREE_ORANGE; i > 0; i--) {
 
 			Effacer(TEMPS_AXE_NS);
-			Afficher(TEMPS_AXE_NS, i, STANDARD, NORMALE);
+			Afficher(TEMPS_AXE_NS, i, GRAS, NORMALE);
 			Effacer(TEMPS_AXE_EO);
-			Afficher(TEMPS_AXE_EO, i + DUREE_ROUGE, STANDARD, NORMALE);
+			Afficher(TEMPS_AXE_EO, i + DUREE_ROUGE, GRAS, NORMALE);
 			sleep(1);
 
 		}
@@ -235,9 +235,9 @@ void GestFeux (int idSemEtat, int idMemEtat, int idSemDuree, int idMemDuree) {
 		for(int i = DUREE_ROUGE; i > 0; i--) {
 
 			Effacer(TEMPS_AXE_NS);
-			Afficher(TEMPS_AXE_NS, i, STANDARD, NORMALE);
+			Afficher(TEMPS_AXE_NS, i, GRAS, NORMALE);
 			Effacer(TEMPS_AXE_EO);
-			Afficher(TEMPS_AXE_EO, i, STANDARD, NORMALE);
+			Afficher(TEMPS_AXE_EO, i, GRAS, NORMALE);
 			sleep(1);
 
 		}
@@ -245,7 +245,7 @@ void GestFeux (int idSemEtat, int idMemEtat, int idSemDuree, int idMemDuree) {
 		// Le feu sur l'axe E-O passe à vert :
 		//	- Affichage
 		Effacer(COULEUR_AXE_EO);
-		Afficher(COULEUR_AXE_EO, VERT, STANDARD, NORMALE);
+		Afficher(COULEUR_AXE_EO, VERT, GRAS, NORMALE);
 		//	- Mise à jour de la mémoire partagée
 		updateMemEtat(false, true);
 		//	- Mise à jour des durées des feux
@@ -256,9 +256,9 @@ void GestFeux (int idSemEtat, int idMemEtat, int idSemDuree, int idMemDuree) {
 		for(int i = dureeEO; i > 0; i--) {
 
 			Effacer(TEMPS_AXE_EO);
-			Afficher(TEMPS_AXE_EO, i, STANDARD, NORMALE);
+			Afficher(TEMPS_AXE_EO, i, GRAS, NORMALE);
 			Effacer(TEMPS_AXE_NS);
-			Afficher(TEMPS_AXE_NS, i + DUREE_ARRET, STANDARD, NORMALE);
+			Afficher(TEMPS_AXE_NS, i + DUREE_ARRET, GRAS, NORMALE);
 			sleep(1);
 
 		}
@@ -275,9 +275,9 @@ void GestFeux (int idSemEtat, int idMemEtat, int idSemDuree, int idMemDuree) {
 		for(int i = DUREE_ORANGE; i > 0; i--) {
 
 			Effacer(TEMPS_AXE_EO);
-			Afficher(TEMPS_AXE_EO, i, STANDARD, NORMALE);
+			Afficher(TEMPS_AXE_EO, i, GRAS, NORMALE);
 			Effacer(TEMPS_AXE_NS);
-			Afficher(TEMPS_AXE_NS, i + DUREE_ROUGE, STANDARD, NORMALE);
+			Afficher(TEMPS_AXE_NS, i + DUREE_ROUGE, GRAS, NORMALE);
 			sleep(1);
 
 		}
@@ -292,9 +292,9 @@ void GestFeux (int idSemEtat, int idMemEtat, int idSemDuree, int idMemDuree) {
 		for(int i = DUREE_ROUGE; i > 0; i--) {
 
 			Effacer(TEMPS_AXE_EO);
-			Afficher(TEMPS_AXE_EO, i, STANDARD, NORMALE);
+			Afficher(TEMPS_AXE_EO, i, GRAS, NORMALE);
 			Effacer(TEMPS_AXE_NS);
-			Afficher(TEMPS_AXE_NS, i, STANDARD, NORMALE);
+			Afficher(TEMPS_AXE_NS, i, GRAS, NORMALE);
 			sleep(1);
 
 		}
@@ -302,7 +302,7 @@ void GestFeux (int idSemEtat, int idMemEtat, int idSemDuree, int idMemDuree) {
 		// Le feu sur l'axe N-S passe à vert :
 		//	- Affichage
 		Effacer(COULEUR_AXE_NS);
-		Afficher(COULEUR_AXE_NS, VERT, STANDARD, NORMALE);
+		Afficher(COULEUR_AXE_NS, VERT, GRAS, NORMALE);
 		//	- Mise à jour de la mémoire partagée
 		updateMemEtat(true, false);
 		
